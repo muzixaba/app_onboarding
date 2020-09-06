@@ -45,7 +45,7 @@ List<SliderModel> getSlides(){
   sliderModel.setDesc("Discover Restaurants offering the best fast food food near you on Foodwa");
   sliderModel.setTitle("Search");
   sliderModel.setImageAssetPath("assets/illustration.png");
-  slides.add(sliderModel);
+  slides.add(sliderModel); // add slider model to list
 
   sliderModel = new SliderModel();
 
