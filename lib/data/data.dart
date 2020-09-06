@@ -42,8 +42,8 @@ List<SliderModel> getSlides(){
   SliderModel sliderModel = new SliderModel();
 
   //1
-  sliderModel.setDesc("Discover Restaurants offering the best fast food food near you on Foodwa");
-  sliderModel.setTitle("Search");
+  sliderModel.setDesc("This is Slide One description");
+  sliderModel.setTitle("Slide One Title");
   sliderModel.setImageAssetPath("assets/illustration.png");
   slides.add(sliderModel); // add slider model to list
 
@@ -58,12 +58,12 @@ List<SliderModel> getSlides(){
   sliderModel = new SliderModel();
 
   //3
-  sliderModel.setDesc("Food delivery or pickup from local restaurants, Explore restaurants that deliver near you.");
-  sliderModel.setTitle("Eat");
+  sliderModel.setDesc("Enter your cell number & click 'CONFIRM CELL'");
+  sliderModel.setTitle("Your Cellphone Number");
   sliderModel.setImageAssetPath("assets/illustration3.png");
   slides.add(sliderModel);
 
-  sliderModel = new SliderModel();
+  // sliderModel = new SliderModel();
 
   return slides;
 }

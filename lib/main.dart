@@ -76,7 +76,7 @@ class _HomeState extends State<Home> {
               title: mySLides[1].getTitle(),
               desc: mySLides[1].getDesc(),
             ),
-            SlideTile(
+            lastSlideTile(
               imagePath: mySLides[2].getImageAssetPath(),
               title: mySLides[2].getTitle(),
               desc: mySLides[2].getDesc(),
@@ -91,6 +91,7 @@ class _HomeState extends State<Home> {
             children: <Widget>[
               FlatButton(
                 onPressed: (){
+                  // jump to 3rd page
                   controller.animateToPage(2, duration: Duration(milliseconds: 400), curve: Curves.linear);
                 },
                 splashColor: Colors.blue[50],
@@ -100,6 +101,7 @@ class _HomeState extends State<Home> {
                 ),
               ),
               Container(
+                // show page indicator
                 child: Row(
                   children: [
                     for (int i = 0; i < 3 ; i++) i == slideIndex ? _buildPageIndicator(true): _buildPageIndicator(false),
@@ -120,14 +122,14 @@ class _HomeState extends State<Home> {
           ),
         ): InkWell(
           onTap: (){
-            print("Get Started Now");
+            print("Must send user to number verification screen");
           },
           child: Container(
             height: Platform.isIOS ? 70 : 60,
             color: Colors.blue,
             alignment: Alignment.center,
             child: Text(
-              "GET STARTED NOW",
+              "CONFIRM CELL",
               style: TextStyle(color: Colors.white, fontWeight: FontWeight.w600),
             ),
           ),
@@ -170,3 +172,53 @@ class SlideTile extends StatelessWidget {
   }
 }
 
+
+class lastSlideTile extends StatelessWidget {
+  String imagePath, title, desc;
+
+  lastSlideTile({this.imagePath, this.title, this.desc});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: EdgeInsets.symmetric(horizontal: 20),
+      alignment: Alignment.center,
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: <Widget>[
+          Image.asset(imagePath),
+          SizedBox(
+            height: 40,
+          ),
+          Text(title, textAlign: TextAlign.center,style: TextStyle(
+              fontWeight: FontWeight.w500,
+              fontSize: 20
+          ),),
+          SizedBox(
+            height: 20,
+          ),
+          Text(desc, textAlign: TextAlign.center,style: TextStyle(
+              fontWeight: FontWeight.w500,
+              fontSize: 14)),
+      SizedBox(
+        height: 20,
+      ),
+      TextFormField(
+        decoration: InputDecoration(
+          prefixIcon: Icon(Icons.phone,color: Colors.black26),
+          // labelText: 'Your Cell',
+          border: InputBorder.none,
+          filled: true,
+          // fillColor: Colors.white,
+        ),
+        keyboardType:  TextInputType.phone,
+        // validator: validateCell,
+        // onSaved: (value) => _cell = value,
+      ),
+      // )
+      ],
+
+      ),
+    );
+  }
+}
