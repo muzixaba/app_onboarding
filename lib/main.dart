@@ -76,10 +76,11 @@ class _HomeState extends State<Home> {
               title: mySLides[1].getTitle(),
               desc: mySLides[1].getDesc(),
             ),
-            lastSlideTile(
+            LastSlideTile(
               imagePath: mySLides[2].getImageAssetPath(),
               title: mySLides[2].getTitle(),
               desc: mySLides[2].getDesc(),
+              inputIcon: Icon(Icons.phone,color: Colors.black45),
             )
           ],
           ),
@@ -122,15 +123,23 @@ class _HomeState extends State<Home> {
           ),
         ): InkWell(
           onTap: (){
-            print("Must send user to number verification screen");
+            //TODO: navigate to VerificationScreen
+            // valid cell number must be entered for InkWell to work
+            print("Must send user to VerificationScreen");
+            // Within the `FirstRoute` widget
+            // onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => VerificationScreen()),
+              );
           },
           child: Container(
             height: Platform.isIOS ? 70 : 60,
             color: Colors.blue,
             alignment: Alignment.center,
             child: Text(
-              "CONFIRM CELL",
-              style: TextStyle(color: Colors.white, fontWeight: FontWeight.w600),
+              "Submit",
+              style: TextStyle(color: Colors.white, fontWeight: FontWeight.w600, fontSize: 20.0),
             ),
           ),
         ),
@@ -140,7 +149,7 @@ class _HomeState extends State<Home> {
 }
 
 class SlideTile extends StatelessWidget {
-  String imagePath, title, desc;
+  final String imagePath, title, desc;
 
   SlideTile({this.imagePath, this.title, this.desc});
 
@@ -173,10 +182,11 @@ class SlideTile extends StatelessWidget {
 }
 
 
-class lastSlideTile extends StatelessWidget {
-  String imagePath, title, desc;
+class LastSlideTile extends StatelessWidget {
+  final String imagePath, title, desc;
+  final Icon inputIcon;
 
-  lastSlideTile({this.imagePath, this.title, this.desc});
+  LastSlideTile({this.imagePath, this.title, this.desc, this.inputIcon});
 
   @override
   Widget build(BuildContext context) {
@@ -200,24 +210,76 @@ class lastSlideTile extends StatelessWidget {
           Text(desc, textAlign: TextAlign.center,style: TextStyle(
               fontWeight: FontWeight.w500,
               fontSize: 14)),
-      SizedBox(
-        height: 20,
-      ),
-      TextFormField(
-        decoration: InputDecoration(
-          prefixIcon: Icon(Icons.phone,color: Colors.black26),
-          // labelText: 'Your Cell',
-          border: InputBorder.none,
-          filled: true,
-          // fillColor: Colors.white,
-        ),
-        keyboardType:  TextInputType.phone,
-        // validator: validateCell,
-        // onSaved: (value) => _cell = value,
-      ),
+          SizedBox(
+            height: 20,
+          ),
+          TextFormField(
+            decoration: InputDecoration(
+              prefixIcon: inputIcon,
+              // labelText: 'Your Cell',
+              // border: InputBorder.none,
+              border: new OutlineInputBorder(
+                borderRadius: new BorderRadius.circular(10.0),
+                borderSide: new BorderSide(),
+              ),
+              filled: true,
+              // fillColor: Colors.white,
+            ),
+            keyboardType:  TextInputType.phone,
+            // validator: validateCell,
+            // onSaved: (value) => _cell = value,
+          ),
       // )
       ],
+      ),
+    );
+  }
+}
 
+class VerificationScreen extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      debugShowCheckedModeBanner: false,
+      home: Scaffold(
+        body: Container(
+          padding: EdgeInsets.symmetric(horizontal: 20),
+          alignment: Alignment.center,
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              LastSlideTile(
+                imagePath: 'assets/text.png',
+                title: "Enter your Verification Code",
+                desc: "Please enter the 4 digit code the was sent as as SMS and click Submit",
+                inputIcon: Icon(Icons.verified,color: Colors.black45),
+              ),
+              SizedBox(
+                height: 20,
+              ),
+              Text("Resend Code"),
+            ],
+          )
+        ),
+        bottomSheet: InkWell(
+          onTap: (){
+            print("Submit tapped");
+            //TODO: navigate to Profile page
+            // Navigator.push(
+            //   context,
+            //   MaterialPageRoute(builder: (context) => VerificationScreen()),
+            // );
+          },
+          child: Container(
+            height: Platform.isIOS ? 70 : 60,
+            color: Colors.blue,
+            alignment: Alignment.center,
+            child: Text(
+              "Submit",
+              style: TextStyle(color: Colors.white, fontWeight: FontWeight.w600, fontSize: 20.0),
+            ),
+          ),
+        ),
       ),
     );
   }
