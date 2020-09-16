@@ -2,20 +2,47 @@ import 'dart:io';
 import 'package:app_onboarding/data/data.dart';
 import 'package:app_onboarding/data/main.dart';
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
-void main() {
+
+String _cell;
+
+Future<void> main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  SharedPreferences prefs = await SharedPreferences.getInstance();
+  _cell = await prefs.getString("userCell");
+  // await prefs.setString("userCell", "09876543");
+  print('userCell: $_cell');
   runApp(MyApp());
 }
 
-class MyApp extends StatelessWidget {
+
+class MyApp extends StatefulWidget {
+
+  @override
+  _MyAppState createState() => _MyAppState();
+}
+
+class _MyAppState extends State<MyApp> {
+
+  @override
+  void initState() {
+    super.initState();
+  }
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      home: Home(),
+      initialRoute: _cell == null ? "/" : "VS",
+      routes: {
+        "/": (context) => Home(),
+        "VS": (context) => VerificationScreen(),
+      },
       debugShowCheckedModeBanner: false,
     );
   }
 }
+
 
 class Home extends StatefulWidget {
   @override
@@ -23,10 +50,18 @@ class Home extends StatefulWidget {
 }
 
 class _HomeState extends State<Home> {
+  String _enteredCell;
 
   List<SliderModel> mySLides = new List<SliderModel>();
   int slideIndex = 0;
   PageController controller;
+
+  /// set shared preference values
+  void setValue(String key, String value) async {
+    SharedPreferences sharedPrefs = await SharedPreferences.getInstance();
+    // set shared pref
+    sharedPrefs.setString(key, value);
+  }
 
   Widget _buildPageIndicator(bool isCurrentPage){
     return Container(
@@ -45,7 +80,7 @@ class _HomeState extends State<Home> {
     // TODO: implement initState
     super.initState();
     mySLides = getSlides();
-    controller = new PageController();
+    controller = PageController();
   }
 
   @override
@@ -76,12 +111,11 @@ class _HomeState extends State<Home> {
               title: mySLides[1].getTitle(),
               desc: mySLides[1].getDesc(),
             ),
-            LastSlideTile(
+            SlideTile(
               imagePath: mySLides[2].getImageAssetPath(),
               title: mySLides[2].getTitle(),
               desc: mySLides[2].getDesc(),
-              inputIcon: Icon(Icons.phone,color: Colors.black45),
-            )
+            ),
           ],
           ),
         ),
@@ -123,15 +157,17 @@ class _HomeState extends State<Home> {
           ),
         ): InkWell(
           onTap: (){
-            //TODO: navigate to VerificationScreen
-            // valid cell number must be entered for InkWell to work
+            //TODO: Display showDialog screen for user to confirm cell number
             print("Must send user to VerificationScreen");
-            // Within the `FirstRoute` widget
             // onPressed: () {
-              Navigator.push(
+            // setValue("userCell", _enteredCell);
+            Navigator.push(
                 context,
-                MaterialPageRoute(builder: (context) => VerificationScreen()),
-              );
+                MaterialPageRoute(builder: (context) => CellNumEnterScreen(),
+              // MaterialPageRoute(builder: (context) => VerificationScreen(enteredCell: value)
+            ),
+
+            );
           },
           child: Container(
             height: Platform.isIOS ? 70 : 60,
@@ -147,6 +183,7 @@ class _HomeState extends State<Home> {
     );
   }
 }
+
 
 class SlideTile extends StatelessWidget {
   final String imagePath, title, desc;
@@ -182,11 +219,21 @@ class SlideTile extends StatelessWidget {
 }
 
 
-class LastSlideTile extends StatelessWidget {
+class LastSlideTile extends StatefulWidget {
   final String imagePath, title, desc;
   final Icon inputIcon;
 
   LastSlideTile({this.imagePath, this.title, this.desc, this.inputIcon});
+
+  @override
+  _LastSlideTileState createState() => _LastSlideTileState();
+}
+
+
+class _LastSlideTileState extends State<LastSlideTile> {
+  var _controller = TextEditingController();
+  String _enteredCell;
+
 
   @override
   Widget build(BuildContext context) {
@@ -196,38 +243,38 @@ class LastSlideTile extends StatelessWidget {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: <Widget>[
-          Image.asset(imagePath),
+          Image.asset(widget.imagePath),
           SizedBox(
             height: 40,
           ),
-          Text(title, textAlign: TextAlign.center,style: TextStyle(
+          Text(widget.title, textAlign: TextAlign.center,style: TextStyle(
               fontWeight: FontWeight.w500,
               fontSize: 20
           ),),
           SizedBox(
             height: 20,
           ),
-          Text(desc, textAlign: TextAlign.center,style: TextStyle(
+          Text(widget.desc, textAlign: TextAlign.center,style: TextStyle(
               fontWeight: FontWeight.w500,
               fontSize: 14)),
           SizedBox(
             height: 20,
           ),
           TextFormField(
+            controller: _controller,
+            autofocus: true,
             decoration: InputDecoration(
-              prefixIcon: inputIcon,
-              // labelText: 'Your Cell',
-              // border: InputBorder.none,
-              border: new OutlineInputBorder(
-                borderRadius: new BorderRadius.circular(10.0),
-                borderSide: new BorderSide(),
+              prefixIcon: widget.inputIcon,
+              border: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(10.0),
+                borderSide: BorderSide(),
               ),
               filled: true,
-              // fillColor: Colors.white,
             ),
             keyboardType:  TextInputType.phone,
             // validator: validateCell,
-            // onSaved: (value) => _cell = value,
+            // onSaved: (String value) => VerificationScreen(enteredCell: value),
+            onSaved: (value) => print(value),
           ),
       // )
       ],
@@ -236,7 +283,80 @@ class LastSlideTile extends StatelessWidget {
   }
 }
 
+class CellNumEnterScreen extends StatelessWidget {
+  final _controller = TextEditingController();
+
+
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      debugShowCheckedModeBanner: false,
+      home: Scaffold(
+        body: Container(
+            padding: EdgeInsets.symmetric(horizontal: 20),
+            alignment: Alignment.center,
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                SlideTile(
+                  imagePath: 'assets/phone.png',
+                  title: "Your Cell Phone Number",
+                  desc: "Please enter your cell number for verification",
+                ),
+                SizedBox(
+                  height: 20,
+                ),
+                TextFormField(
+                  controller: _controller,
+                  autofocus: true,
+                  decoration: InputDecoration(
+                    prefixIcon: Icon(Icons.phone,color: Colors.black45),
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(10.0),
+                      borderSide: BorderSide(),
+                    ),
+                    filled: true,
+                  ),
+                  keyboardType:  TextInputType.phone,
+                  // validator: validateCell,
+                  // onSaved: (String value) => VerificationScreen(enteredCell: value),
+                  onSaved: (value) => print(value),
+                ),
+              ],
+            )
+        ),
+        bottomSheet: InkWell(
+          onTap: (){
+            print("Submit tapped");
+            //TODO: navigate to Profile page
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                  builder: (context) => VerificationScreen(enteredCell: _controller.text,),
+              ),
+            );
+          },
+          child: Container(
+            height: Platform.isIOS ? 70 : 60,
+            color: Colors.blue,
+            alignment: Alignment.center,
+            child: Text(
+              "Send Cell Number",
+              style: TextStyle(color: Colors.white, fontWeight: FontWeight.w600, fontSize: 20.0),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+
 class VerificationScreen extends StatelessWidget {
+  final String enteredCell;
+
+  VerificationScreen({Key key, this.enteredCell}) : super(key: key);
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -251,13 +371,13 @@ class VerificationScreen extends StatelessWidget {
               LastSlideTile(
                 imagePath: 'assets/text.png',
                 title: "Enter your Verification Code",
-                desc: "Please enter the 4 digit code the was sent as as SMS and click Submit",
+                desc: "Enter the 4 digit code the was sent to $enteredCell via SMS",
                 inputIcon: Icon(Icons.verified,color: Colors.black45),
               ),
               SizedBox(
                 height: 20,
               ),
-              Text("Resend Code"),
+              Text("resend code"),
             ],
           )
         ),
