@@ -58,8 +58,8 @@ List<SliderModel> getSlides(){
   sliderModel = new SliderModel();
 
   //3
-  sliderModel.setDesc("Enter your cell number & click 'Submit'");
-  sliderModel.setTitle("Your Cellphone Number");
+  sliderModel.setDesc("Click Done so you can enter your cell on the next page");
+  sliderModel.setTitle("That's It");
   sliderModel.setImageAssetPath("assets/illustration3.png");
   slides.add(sliderModel);
 

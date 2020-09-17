@@ -166,7 +166,6 @@ class _HomeState extends State<Home> {
                 MaterialPageRoute(builder: (context) => CellNumEnterScreen(),
               // MaterialPageRoute(builder: (context) => VerificationScreen(enteredCell: value)
             ),
-
             );
           },
           child: Container(
@@ -174,7 +173,7 @@ class _HomeState extends State<Home> {
             color: Colors.blue,
             alignment: Alignment.center,
             child: Text(
-              "Submit",
+              "Done",
               style: TextStyle(color: Colors.white, fontWeight: FontWeight.w600, fontSize: 20.0),
             ),
           ),
@@ -219,70 +218,6 @@ class SlideTile extends StatelessWidget {
 }
 
 
-class LastSlideTile extends StatefulWidget {
-  final String imagePath, title, desc;
-  final Icon inputIcon;
-
-  LastSlideTile({this.imagePath, this.title, this.desc, this.inputIcon});
-
-  @override
-  _LastSlideTileState createState() => _LastSlideTileState();
-}
-
-
-class _LastSlideTileState extends State<LastSlideTile> {
-  var _controller = TextEditingController();
-  String _enteredCell;
-
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      padding: EdgeInsets.symmetric(horizontal: 20),
-      alignment: Alignment.center,
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: <Widget>[
-          Image.asset(widget.imagePath),
-          SizedBox(
-            height: 40,
-          ),
-          Text(widget.title, textAlign: TextAlign.center,style: TextStyle(
-              fontWeight: FontWeight.w500,
-              fontSize: 20
-          ),),
-          SizedBox(
-            height: 20,
-          ),
-          Text(widget.desc, textAlign: TextAlign.center,style: TextStyle(
-              fontWeight: FontWeight.w500,
-              fontSize: 14)),
-          SizedBox(
-            height: 20,
-          ),
-          TextFormField(
-            controller: _controller,
-            autofocus: true,
-            decoration: InputDecoration(
-              prefixIcon: widget.inputIcon,
-              border: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(10.0),
-                borderSide: BorderSide(),
-              ),
-              filled: true,
-            ),
-            keyboardType:  TextInputType.phone,
-            // validator: validateCell,
-            // onSaved: (String value) => VerificationScreen(enteredCell: value),
-            onSaved: (value) => print(value),
-          ),
-      // )
-      ],
-      ),
-    );
-  }
-}
-
 class CellNumEnterScreen extends StatelessWidget {
   final _controller = TextEditingController();
 
@@ -308,7 +243,7 @@ class CellNumEnterScreen extends StatelessWidget {
                 ),
                 TextFormField(
                   controller: _controller,
-                  autofocus: true,
+                  // autofocus: true,
                   decoration: InputDecoration(
                     prefixIcon: Icon(Icons.phone,color: Colors.black45),
                     border: OutlineInputBorder(
@@ -353,54 +288,77 @@ class CellNumEnterScreen extends StatelessWidget {
 
 
 class VerificationScreen extends StatelessWidget {
+  final _controller = TextEditingController();
   final String enteredCell;
 
   VerificationScreen({Key key, this.enteredCell}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      debugShowCheckedModeBanner: false,
-      home: Scaffold(
-        body: Container(
-          padding: EdgeInsets.symmetric(horizontal: 20),
-          alignment: Alignment.center,
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              LastSlideTile(
-                imagePath: 'assets/text.png',
-                title: "Enter your Verification Code",
-                desc: "Enter the 4 digit code the was sent to $enteredCell via SMS",
-                inputIcon: Icon(Icons.verified,color: Colors.black45),
-              ),
-              SizedBox(
-                height: 20,
-              ),
-              Text("resend code"),
-            ],
-          )
-        ),
-        bottomSheet: InkWell(
-          onTap: (){
-            print("Submit tapped");
-            //TODO: navigate to Profile page
-            // Navigator.push(
-            //   context,
-            //   MaterialPageRoute(builder: (context) => VerificationScreen()),
-            // );
-          },
-          child: Container(
-            height: Platform.isIOS ? 70 : 60,
-            color: Colors.blue,
+      return MaterialApp(
+        debugShowCheckedModeBanner: false,
+        home: Scaffold(
+          body: Container(
+            padding: EdgeInsets.symmetric(horizontal: 20),
             alignment: Alignment.center,
-            child: Text(
-              "Submit",
-              style: TextStyle(color: Colors.white, fontWeight: FontWeight.w600, fontSize: 20.0),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                SlideTile(
+                  imagePath: 'assets/text.png',
+                  title: "Enter Verification Code",
+                  desc: "Enter the 4 digit code the was sent to $enteredCell via SMS",
+                ),
+                SizedBox(
+                  height: 20,
+                ),
+                TextFormField(
+                  controller: _controller,
+                  // autofocus: true,
+                  decoration: InputDecoration(
+                    prefixIcon: Icon(Icons.verified,color: Colors.black45),
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(10.0),
+                      borderSide: BorderSide(),
+                    ),
+                    filled: true,
+                  ),
+                  keyboardType:  TextInputType.phone,
+                  // validator: validateCell,
+                  // onSaved: (String value) => VerificationScreen(enteredCell: value),
+                  onSaved: (value) => print(value),
+                ),
+                SizedBox(
+                  height: 20,
+                ),
+                Text("resend code"),
+              ],
+            )
+          ),
+          bottomSheet: InkWell(
+            onTap: (){
+              print("Submit tapped");
+              print(_controller.text);
+              //TODO: send request to backend to verify verification code
+              //TODO: If code is correct, save cell num to profile
+              //TODO: navigate to Profile page
+
+              // Navigator.push(
+              //   context,
+              //   MaterialPageRoute(builder: (context) => VerificationScreen()),
+              // );
+            },
+            child: Container(
+              height: Platform.isIOS ? 70 : 60,
+              color: Colors.blue,
+              alignment: Alignment.center,
+              child: Text(
+                "Submit",
+                style: TextStyle(color: Colors.white, fontWeight: FontWeight.w600, fontSize: 20.0),
+              ),
             ),
           ),
         ),
-      ),
     );
   }
 }
