@@ -1,6 +1,5 @@
 import 'dart:io';
 import 'package:app_onboarding/data/data.dart';
-import 'package:app_onboarding/data/main.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
