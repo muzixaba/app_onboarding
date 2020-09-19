@@ -4,7 +4,6 @@ import 'package:app_onboarding/data/main.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-
 String _cell;
 
 Future<void> main() async {
@@ -16,15 +15,12 @@ Future<void> main() async {
   runApp(MyApp());
 }
 
-
 class MyApp extends StatefulWidget {
-
   @override
   _MyAppState createState() => _MyAppState();
 }
 
 class _MyAppState extends State<MyApp> {
-
   @override
   void initState() {
     super.initState();
@@ -43,15 +39,12 @@ class _MyAppState extends State<MyApp> {
   }
 }
 
-
 class Home extends StatefulWidget {
   @override
   _HomeState createState() => _HomeState();
 }
 
 class _HomeState extends State<Home> {
-  String _enteredCell;
-
   List<SliderModel> mySLides = new List<SliderModel>();
   int slideIndex = 0;
   PageController controller;
@@ -63,9 +56,9 @@ class _HomeState extends State<Home> {
     sharedPrefs.setString(key, value);
   }
 
-  Widget _buildPageIndicator(bool isCurrentPage){
+  Widget _buildPageIndicator(bool isCurrentPage) {
     return Container(
-     margin: EdgeInsets.symmetric(horizontal: 2.0),
+      margin: EdgeInsets.symmetric(horizontal: 2.0),
       height: isCurrentPage ? 10.0 : 6.0,
       width: isCurrentPage ? 10.0 : 6.0,
       decoration: BoxDecoration(
@@ -95,94 +88,111 @@ class _HomeState extends State<Home> {
           height: MediaQuery.of(context).size.height - 100,
           child: PageView(
             controller: controller,
-              onPageChanged: (index) {
-                setState(() {
-                  slideIndex = index;
-                });
-              },
-          children: <Widget>[
-            SlideTile(
-              imagePath: mySLides[0].getImageAssetPath(),
-              title: mySLides[0].getTitle(),
-              desc: mySLides[0].getDesc(),
-            ),
-            SlideTile(
-              imagePath: mySLides[1].getImageAssetPath(),
-              title: mySLides[1].getTitle(),
-              desc: mySLides[1].getDesc(),
-            ),
-            SlideTile(
-              imagePath: mySLides[2].getImageAssetPath(),
-              title: mySLides[2].getTitle(),
-              desc: mySLides[2].getDesc(),
-            ),
-          ],
-          ),
-        ),
-        bottomSheet: slideIndex != 2 ? Container(
-          margin: EdgeInsets.symmetric(vertical: 16),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            onPageChanged: (index) {
+              setState(() {
+                slideIndex = index;
+              });
+            },
             children: <Widget>[
-              FlatButton(
-                onPressed: (){
-                  // jump to 3rd page
-                  controller.animateToPage(2, duration: Duration(milliseconds: 400), curve: Curves.linear);
-                },
-                splashColor: Colors.blue[50],
-                child: Text(
-                  "SKIP",
-                  style: TextStyle(color: Color(0xFF0074E4), fontWeight: FontWeight.w600),
-                ),
+              SlideTile(
+                imagePath: mySLides[0].getImageAssetPath(),
+                title: mySLides[0].getTitle(),
+                desc: mySLides[0].getDesc(),
               ),
-              Container(
-                // show page indicator
-                child: Row(
-                  children: [
-                    for (int i = 0; i < 3 ; i++) i == slideIndex ? _buildPageIndicator(true): _buildPageIndicator(false),
-                  ],),
+              SlideTile(
+                imagePath: mySLides[1].getImageAssetPath(),
+                title: mySLides[1].getTitle(),
+                desc: mySLides[1].getDesc(),
               ),
-              FlatButton(
-                onPressed: (){
-                  print("this is slideIndex: $slideIndex");
-                  controller.animateToPage(slideIndex + 1, duration: Duration(milliseconds: 500), curve: Curves.linear);
-                },
-                splashColor: Colors.blue[50],
-                child: Text(
-                  "NEXT",
-                  style: TextStyle(color: Color(0xFF0074E4), fontWeight: FontWeight.w600),
-                ),
+              SlideTile(
+                imagePath: mySLides[2].getImageAssetPath(),
+                title: mySLides[2].getTitle(),
+                desc: mySLides[2].getDesc(),
               ),
             ],
           ),
-        ): InkWell(
-          onTap: (){
-            //TODO: Display showDialog screen for user to confirm cell number
-            print("Must send user to VerificationScreen");
-            // onPressed: () {
-            // setValue("userCell", _enteredCell);
-            Navigator.push(
-                context,
-                MaterialPageRoute(builder: (context) => CellNumEnterScreen(),
-              // MaterialPageRoute(builder: (context) => VerificationScreen(enteredCell: value)
-            ),
-            );
-          },
-          child: Container(
-            height: Platform.isIOS ? 70 : 60,
-            color: Colors.blue,
-            alignment: Alignment.center,
-            child: Text(
-              "Done",
-              style: TextStyle(color: Colors.white, fontWeight: FontWeight.w600, fontSize: 20.0),
-            ),
-          ),
         ),
+        bottomSheet: slideIndex != 2
+            ? Container(
+                margin: EdgeInsets.symmetric(vertical: 16),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: <Widget>[
+                    FlatButton(
+                      onPressed: () {
+                        // jump to 3rd page
+                        controller.animateToPage(2,
+                            duration: Duration(milliseconds: 400),
+                            curve: Curves.linear);
+                      },
+                      splashColor: Colors.blue[50],
+                      child: Text(
+                        "SKIP",
+                        style: TextStyle(
+                            color: Color(0xFF0074E4),
+                            fontWeight: FontWeight.w600),
+                      ),
+                    ),
+                    Container(
+                      // show page indicator
+                      child: Row(
+                        children: [
+                          for (int i = 0; i < 3; i++)
+                            i == slideIndex
+                                ? _buildPageIndicator(true)
+                                : _buildPageIndicator(false),
+                        ],
+                      ),
+                    ),
+                    FlatButton(
+                      onPressed: () {
+                        print("this is slideIndex: $slideIndex");
+                        controller.animateToPage(slideIndex + 1,
+                            duration: Duration(milliseconds: 500),
+                            curve: Curves.linear);
+                      },
+                      splashColor: Colors.blue[50],
+                      child: Text(
+                        "NEXT",
+                        style: TextStyle(
+                            color: Color(0xFF0074E4),
+                            fontWeight: FontWeight.w600),
+                      ),
+                    ),
+                  ],
+                ),
+              )
+            : InkWell(
+                onTap: () {
+                  //TODO: Display showDialog screen for user to confirm cell number
+                  print("Must send user to VerificationScreen");
+                  // onPressed: () {
+                  // setValue("userCell", _enteredCell);
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => CellNumEnterScreen(),
+                      // MaterialPageRoute(builder: (context) => VerificationScreen(enteredCell: value)
+                    ),
+                  );
+                },
+                child: Container(
+                  height: Platform.isIOS ? 70 : 60,
+                  color: Colors.blue,
+                  alignment: Alignment.center,
+                  child: Text(
+                    "Done",
+                    style: TextStyle(
+                        color: Colors.white,
+                        fontWeight: FontWeight.w600,
+                        fontSize: 20.0),
+                  ),
+                ),
+              ),
       ),
     );
   }
 }
-
 
 class SlideTile extends StatelessWidget {
   final String imagePath, title, desc;
@@ -201,26 +211,25 @@ class SlideTile extends StatelessWidget {
           SizedBox(
             height: 40,
           ),
-          Text(title, textAlign: TextAlign.center,style: TextStyle(
-            fontWeight: FontWeight.w500,
-            fontSize: 20
-          ),),
+          Text(
+            title,
+            textAlign: TextAlign.center,
+            style: TextStyle(fontWeight: FontWeight.w500, fontSize: 20),
+          ),
           SizedBox(
             height: 20,
           ),
-          Text(desc, textAlign: TextAlign.center,style: TextStyle(
-          fontWeight: FontWeight.w500,
-              fontSize: 14))
+          Text(desc,
+              textAlign: TextAlign.center,
+              style: TextStyle(fontWeight: FontWeight.w500, fontSize: 14))
         ],
       ),
     );
   }
 }
 
-
 class CellNumEnterScreen extends StatelessWidget {
   final _controller = TextEditingController();
-
 
   @override
   Widget build(BuildContext context) {
@@ -245,29 +254,30 @@ class CellNumEnterScreen extends StatelessWidget {
                   controller: _controller,
                   // autofocus: true,
                   decoration: InputDecoration(
-                    prefixIcon: Icon(Icons.phone,color: Colors.black45),
+                    prefixIcon: Icon(Icons.phone, color: Colors.black45),
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(10.0),
                       borderSide: BorderSide(),
                     ),
                     filled: true,
                   ),
-                  keyboardType:  TextInputType.phone,
+                  keyboardType: TextInputType.phone,
                   // validator: validateCell,
                   // onSaved: (String value) => VerificationScreen(enteredCell: value),
                   onSaved: (value) => print(value),
                 ),
               ],
-            )
-        ),
+            )),
         bottomSheet: InkWell(
-          onTap: (){
+          onTap: () {
             print("Submit tapped");
             //TODO: navigate to Profile page
             Navigator.push(
               context,
               MaterialPageRoute(
-                  builder: (context) => VerificationScreen(enteredCell: _controller.text,),
+                builder: (context) => VerificationScreen(
+                  enteredCell: _controller.text,
+                ),
               ),
             );
           },
@@ -277,7 +287,10 @@ class CellNumEnterScreen extends StatelessWidget {
             alignment: Alignment.center,
             child: Text(
               "Send Cell Number",
-              style: TextStyle(color: Colors.white, fontWeight: FontWeight.w600, fontSize: 20.0),
+              style: TextStyle(
+                  color: Colors.white,
+                  fontWeight: FontWeight.w600,
+                  fontSize: 20.0),
             ),
           ),
         ),
@@ -285,7 +298,6 @@ class CellNumEnterScreen extends StatelessWidget {
     );
   }
 }
-
 
 class VerificationScreen extends StatelessWidget {
   final _controller = TextEditingController();
@@ -295,10 +307,10 @@ class VerificationScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-      return MaterialApp(
-        debugShowCheckedModeBanner: false,
-        home: Scaffold(
-          body: Container(
+    return MaterialApp(
+      debugShowCheckedModeBanner: false,
+      home: Scaffold(
+        body: Container(
             padding: EdgeInsets.symmetric(horizontal: 20),
             alignment: Alignment.center,
             child: Column(
@@ -307,7 +319,8 @@ class VerificationScreen extends StatelessWidget {
                 SlideTile(
                   imagePath: 'assets/text.png',
                   title: "Enter Verification Code",
-                  desc: "Enter the 4 digit code the was sent to $enteredCell via SMS",
+                  desc:
+                      "Enter the 4 digit code the was sent to $enteredCell via SMS",
                 ),
                 SizedBox(
                   height: 20,
@@ -316,14 +329,14 @@ class VerificationScreen extends StatelessWidget {
                   controller: _controller,
                   // autofocus: true,
                   decoration: InputDecoration(
-                    prefixIcon: Icon(Icons.verified,color: Colors.black45),
+                    prefixIcon: Icon(Icons.verified, color: Colors.black45),
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(10.0),
                       borderSide: BorderSide(),
                     ),
                     filled: true,
                   ),
-                  keyboardType:  TextInputType.phone,
+                  keyboardType: TextInputType.phone,
                   // validator: validateCell,
                   // onSaved: (String value) => VerificationScreen(enteredCell: value),
                   onSaved: (value) => print(value),
@@ -333,32 +346,34 @@ class VerificationScreen extends StatelessWidget {
                 ),
                 Text("resend code"),
               ],
-            )
-          ),
-          bottomSheet: InkWell(
-            onTap: (){
-              print("Submit tapped");
-              print(_controller.text);
-              //TODO: send request to backend to verify verification code
-              //TODO: If code is correct, save cell num to profile
-              //TODO: navigate to Profile page
+            )),
+        bottomSheet: InkWell(
+          onTap: () {
+            print("Submit tapped");
+            print(_controller.text);
+            //TODO: send request to backend to verify verification code
+            //TODO: If code is correct, save cell num to profile
+            //TODO: navigate to Profile page
 
-              // Navigator.push(
-              //   context,
-              //   MaterialPageRoute(builder: (context) => VerificationScreen()),
-              // );
-            },
-            child: Container(
-              height: Platform.isIOS ? 70 : 60,
-              color: Colors.blue,
-              alignment: Alignment.center,
-              child: Text(
-                "Submit",
-                style: TextStyle(color: Colors.white, fontWeight: FontWeight.w600, fontSize: 20.0),
-              ),
+            // Navigator.push(
+            //   context,
+            //   MaterialPageRoute(builder: (context) => VerificationScreen()),
+            // );
+          },
+          child: Container(
+            height: Platform.isIOS ? 70 : 60,
+            color: Colors.blue,
+            alignment: Alignment.center,
+            child: Text(
+              "Submit",
+              style: TextStyle(
+                  color: Colors.white,
+                  fontWeight: FontWeight.w600,
+                  fontSize: 20.0),
             ),
           ),
         ),
+      ),
     );
   }
 }
