@@ -3,16 +3,9 @@ import 'package:app_onboarding/data/data.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-String _cell;
 
-Future<void> main() async {
-  WidgetsFlutterBinding.ensureInitialized();
-  SharedPreferences prefs = await SharedPreferences.getInstance();
-  _cell = await prefs.getString("userCell");
-  // await prefs.setString("userCell", "09876543");
-  print('userCell: $_cell');
-  runApp(MyApp());
-}
+void main() => runApp(MyApp());
+
 
 class MyApp extends StatefulWidget {
   @override
@@ -28,9 +21,10 @@ class _MyAppState extends State<MyApp> {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      initialRoute: _cell == null ? "/" : "VS",
+      initialRoute: "start",
       routes: {
-        "/": (context) => Home(),
+        "start": (context) => StartScreen(),
+        "/": (context) => OnboardingHomeScreen(),
         "VS": (context) => VerificationScreen(),
       },
       debugShowCheckedModeBanner: false,
@@ -38,12 +32,76 @@ class _MyAppState extends State<MyApp> {
   }
 }
 
-class Home extends StatefulWidget {
+class StartScreen extends StatefulWidget {
+  const StartScreen({Key key}) : super(key: key);
+
   @override
-  _HomeState createState() => _HomeState();
+  _StartScreenState createState() => _StartScreenState();
 }
 
-class _HomeState extends State<Home> {
+
+class _StartScreenState extends State<StartScreen> {
+
+/// Check if cell number saved before choosing next screen
+  checkCell() async {
+    WidgetsFlutterBinding.ensureInitialized();
+      SharedPreferences prefs = await SharedPreferences.getInstance();
+      String _code = await prefs.getString("enteredCell");
+      print("The code is $_code");
+     if(_code == null) {
+      return Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => CellNumEnterScreen()),
+            );
+    } else {
+    return Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => OnboardingHomeScreen()),
+            );
+    }
+  }
+
+  @override
+void initState() { 
+  super.initState();
+  checkCell();
+}
+
+
+  @override
+  Widget build(BuildContext context) {
+    return SafeArea(
+          child: Scaffold(
+            backgroundColor: Colors.white,
+        body: Center(
+          child: Container(
+            child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                FlutterLogo(
+                  size: 200.0,
+                ),
+                SizedBox(
+                  height: 20.0,
+                ),
+              CircularProgressIndicator(
+                  strokeWidth: 6.0,
+                  backgroundColor: Colors.white,
+              ),
+            ],)
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class OnboardingHomeScreen extends StatefulWidget {
+  @override
+  _OnboardingHomeScreenState createState() => _OnboardingHomeScreenState();
+}
+
+class _OnboardingHomeScreenState extends State<OnboardingHomeScreen> {
   List<SliderModel> mySLides = new List<SliderModel>();
   int slideIndex = 0;
   PageController controller;
@@ -69,7 +127,6 @@ class _HomeState extends State<Home> {
 
   @override
   void initState() {
-    // TODO: implement initState
     super.initState();
     mySLides = getSlides();
     controller = PageController();
@@ -163,15 +220,12 @@ class _HomeState extends State<Home> {
               )
             : InkWell(
                 onTap: () {
-                  //TODO: Display showDialog screen for user to confirm cell number
+                  //TODO: showDialog screen for user to confirm cell number
                   print("Must send user to VerificationScreen");
-                  // onPressed: () {
-                  // setValue("userCell", _enteredCell);
                   Navigator.push(
                     context,
                     MaterialPageRoute(
                       builder: (context) => CellNumEnterScreen(),
-                      // MaterialPageRoute(builder: (context) => VerificationScreen(enteredCell: value)
                     ),
                   );
                 },
@@ -192,6 +246,7 @@ class _HomeState extends State<Home> {
     );
   }
 }
+
 
 class SlideTile extends StatelessWidget {
   final String imagePath, title, desc;
@@ -226,6 +281,7 @@ class SlideTile extends StatelessWidget {
     );
   }
 }
+
 
 class CellNumEnterScreen extends StatelessWidget {
   final _controller = TextEditingController();
@@ -262,7 +318,6 @@ class CellNumEnterScreen extends StatelessWidget {
                   ),
                   keyboardType: TextInputType.phone,
                   // validator: validateCell,
-                  // onSaved: (String value) => VerificationScreen(enteredCell: value),
                   onSaved: (value) => print(value),
                 ),
               ],
@@ -270,11 +325,9 @@ class CellNumEnterScreen extends StatelessWidget {
         bottomSheet: InkWell(
           onTap: () {
             print("Submit tapped");
-            //TODO: navigate to Profile page
             Navigator.push(
               context,
-              MaterialPageRoute(
-                builder: (context) => VerificationScreen(
+              MaterialPageRoute(builder: (context) => VerificationScreen(
                   enteredCell: _controller.text,
                 ),
               ),
@@ -304,6 +357,13 @@ class VerificationScreen extends StatelessWidget {
 
   VerificationScreen({Key key, this.enteredCell}) : super(key: key);
 
+      /// set shared preference values
+  void setPref(String key, String value) async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    prefs.setString(key, value);
+  }
+
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -318,8 +378,7 @@ class VerificationScreen extends StatelessWidget {
                 SlideTile(
                   imagePath: 'assets/text.png',
                   title: "Enter Verification Code",
-                  desc:
-                      "Enter the 4 digit code the was sent to $enteredCell via SMS",
+                  desc: "Enter the 4 digit code the was sent to $enteredCell via SMS",
                 ),
                 SizedBox(
                   height: 20,
@@ -349,11 +408,12 @@ class VerificationScreen extends StatelessWidget {
         bottomSheet: InkWell(
           onTap: () {
             print("Submit tapped");
-            print(_controller.text);
+            print("cellEntered: ${_controller.text}");
             //TODO: send request to backend to verify verification code
-            //TODO: If code is correct, save cell num to profile
+            //TODO: If code is correct, generate token in backend, save cell num to app profile
             //TODO: navigate to Profile page
-
+            //TODO: If code incorrect, return IncorrectCode Exception/Message, ask if to resend
+            setPref("enteredCell", _controller.text);
             // Navigator.push(
             //   context,
             //   MaterialPageRoute(builder: (context) => VerificationScreen()),
